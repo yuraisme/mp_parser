@@ -53,7 +53,9 @@ def db_connection(func):
         logger.info("Открываем соединение с базой")
         try:
             conn = sqlite3.connect(db_path)
-            conn.execute("PRAGMA foreign_keys = ON;")  # Включаем внешние ключи
+            conn.execute(
+                "PRAGMA foreign_keys = ON;"
+            )  # Включаем внешние ключи
             curs = conn.cursor()
             result = func(curs=curs, *args, **kwargs)
             conn.commit()
@@ -62,12 +64,13 @@ def db_connection(func):
             return result
         except Exception as e:
             logger.error(f"Ошибка работы с базой: {e}")
+            conn.close()
 
     return wrapper
 
 
 @db_connection
-def add_good(good: Goods, curs: sqlite3.Cursor) -> bool | None:
+def add_good(good: Goods, curs: sqlite3.Cursor | None = None) -> bool | None:
     if curs is not None:
         sql_check = "SELECT COUNT(*) FROM goods WHERE sku = ?"
         curs.execute(sql_check, (good.sku,))
@@ -84,36 +87,82 @@ def add_good(good: Goods, curs: sqlite3.Cursor) -> bool | None:
 
 
 @db_connection
-def add_opponent(sku: str, opponent: Opponents, curs: sqlite3.Cursor):
+def add_opponent(
+    sku: str, opponent: Opponents, curs: sqlite3.Cursor | None = None
+):
     """добавляем конкурента в базу конкурентов и в таблицу для связки"""
+    if curs is None:
+        raise ValueError("Курсор базы данных не был передан в функцию.")
+
     # logger.info(opponent)
-    if curs is not None:
-        sql_check = "SELECT COUNT(*) FROM opponents WHERE  id = ?"
-        curs.execute(sql_check, (opponent.id,))
-        if curs.fetchone()[0] > 0:
-            logger.warning(f"Товар с SKU {sku} уже существует в таблице")
-            return None
-        sql_insert = "INSERT INTO opponents (id, url, current_price, prev_price, price_change) VALUES (?, ?, ?, ?, ?)"
-        # logger.debug(sql_insert)
-        curs.execute(
-            sql_insert,
-            (
-                opponent.id,
-                opponent.url,
-                opponent.current_price,
-                opponent.prev_price,
-                opponent.price_change,
-            ),
-        )
-        logger.info(f"Товар с SKU {sku} успешно добавлен в opponents.")
-        sql_insert = "INSERT INTO goods_opponents (good_sku, opponent_id) VALUES (?, ?)"
-        curs.execute(
-            sql_insert,
-            (sku, opponent.id),
-        )
-        logger.info(
-            f"Товар конкурентов  с SKU {opponent.id} успешно добавлен в goods_opponents."
-        )
+    sql_check = "SELECT COUNT(*) FROM opponents WHERE  id = ?"
+    curs.execute(sql_check, (opponent.id,))
+    if curs.fetchone()[0] > 0:
+        logger.warning(f"Товар с SKU {sku} уже существует в таблице")
+        return None
+    sql_insert = "INSERT INTO opponents (id, url, current_price, prev_price, price_change) VALUES (?, ?, ?, ?, ?)"
+    # logger.debug(sql_insert)
+    curs.execute(
+        sql_insert,
+        (
+            opponent.id,
+            opponent.url,
+            opponent.current_price,
+            opponent.prev_price,
+            opponent.price_change,
+        ),
+    )
+    logger.info(f"Товар с SKU {sku} успешно добавлен в opponents.")
+    sql_insert = (
+        "INSERT INTO goods_opponents (good_sku, opponent_id) VALUES (?, ?)"
+    )
+    curs.execute(
+        sql_insert,
+        (sku, opponent.id),
+    )
+    logger.info(
+        f"Товар конкурентов  с SKU {opponent.id} успешно добавлен в goods_opponents."
+    )
+    return True
+
+
+@db_connection
+def remove_opponent(
+    id: str, curs: sqlite3.Cursor | None = None
+) -> bool | None:
+    if curs is None:
+        logger.error("Cursor not exist during delete opponent")
+        raise ValueError("Курсор базы данных не был передан в функцию.")
+
+    sql_check = "SELECT COUNT(*) FROM opponents WHERE  id = ?;"
+    curs.execute(sql_check, (id,))
+
+    if curs.fetchone()[0] == 0:
+        logger.warning(f"Товар  конкурента с SKU {id} отсутсвует в таблице")
+        return None
+    else:
+        sql_delete = "DELETE FROM opponents where id = ?;"
+        curs.execute(sql_delete, (id,))
+        logger.info(f"Success delete oponent {id}")
+        return True
+
+
+@db_connection
+def remove_good(sku: str, curs: sqlite3.Cursor | None = None) -> bool | None:
+    if curs is None:
+        logger.error("Cursor not exist during delete good with sku: {sku}")
+        raise ValueError("Курсор базы данных не был передан в функцию.")
+
+    sql_check = "SELECT COUNT(*) FROM goods WHERE  sku = ?;"
+    curs.execute(sql_check, (sku,))
+
+    if curs.fetchone()[0] == 0:
+        logger.warning(f"Товар с SKU {sku} отсутсвует в таблице")
+        return None
+    else:
+        sql_delete = "DELETE FROM goods where sku = ?;"
+        curs.execute(sql_delete, (sku,))
+        logger.info(f"Success delete oponent {sku}")
         return True
 
 
@@ -130,10 +179,12 @@ if __name__ == "__main__":
     #         ),
     #     )
     add_opponent(
-        "8425642362",
+        "8642362",
         Opponents(
             id=str("123"),
             url="https://www.ozon.ru/product/mysh-besprovodnaya-logitech-m170-grey-1731812484/?at=36tWvgxp7uPE5Y6wCEZk8ELhQQYw4mHvAL8VkIlr9EoV",
             current_price=12.0,
         ),
     )
+    remove_opponent("123")
+    remove_good('2323234324')
