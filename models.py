@@ -12,7 +12,7 @@ class Opponents(BaseModel):
     url: str = ""
     current_price: float = 0.0
     prev_price: float = 0.0
-    changinged_price: float = 0.0
+    price_change: float = 0.0
 
 
 class Goods(BaseModel):
