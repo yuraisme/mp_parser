@@ -57,7 +57,7 @@ class GoogleSheetsClient:
         return worksheet.get_all_values()
 
 
-def get_ozon_art(url: str) -> str | None:
+def get_ozon_art(url: str | None = None) -> str | None:
     """return article as string"""
 
     pattern = r"https:\/\/www\.ozon\.ru\/product\/[^\/]+-(\d+)\/"
@@ -72,7 +72,7 @@ def get_ozon_art(url: str) -> str | None:
         return match.group(1)
 
 
-def get_wb_art(url: str) -> str | None:
+def get_wb_art(url: str | None = None) -> str | None:
     pattern = r"https:\/\/www\.wildberries\.ru\/catalog\/(\d+)\/detail"
     if not url:
         logger.error("No url for wildberries SKU")
