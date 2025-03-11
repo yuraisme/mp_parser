@@ -2,8 +2,6 @@ import datetime
 from typing import List
 
 from pydantic import BaseModel
-from pydantic.dataclasses import dataclass
-
 
 class Opponents(BaseModel):
     """Храним в отдельном классе"""
@@ -22,5 +20,6 @@ class Item(BaseModel):
     name: str = ""
     url: str = ""
     price: float = 0.0
+    row: int = 0  # строка в таблице
     opponents_id: List[str] = []
     timestamp: datetime.datetime

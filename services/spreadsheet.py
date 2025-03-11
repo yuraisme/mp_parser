@@ -54,19 +54,24 @@ class GoogleSheetsClient:
         return worksheet.get_all_values()
 
 
-def get_ozon_art(url: str | None = None) -> str | None:
+def get_sku(url: str | None = None) -> str | None:
     """return article as string"""
-
-    pattern = r"https:\/\/www\.ozon\.ru\/product\/[^\/]+-(\d+)\/"
     if not url:
-        logger.error("No url for ozon SKU")
-        raise ValueError("No url for ozon SKU")
-    if "ozon.ru" not in url.lower():
-        logger.error("No CORRECT url for ozon SKU")
-        raise ValueError("No CORRECT url for ozon SKU")
-    match = re.search(pattern, url)
-    if match:
+        logger.error("No url for ozon/WB SKU")
+        raise ValueError("No url for ozon/WB SKU")
+
+    pattern_ozon = r"https:\/\/www\.ozon\.ru\/product\/[^\/]+-(\d+)\/"
+    pattern_wb = r"https:\/\/www\.wildberries\.ru\/catalog\/(\d+)\/detail"
+
+    if match := re.search(pattern_ozon, url):
         return match.group(1)
+
+    if match := re.search(pattern_wb, url):
+        return match.group(1)
+
+    # не случилось ни одного совпадения
+    logger.error("No CORRECT url for ozon/WB SKU")
+    raise ValueError("No CORRECT url for ozon/WB SKU")
 
 
 def get_wb_art(url: str | None = None) -> str | None:
