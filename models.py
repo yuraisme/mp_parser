@@ -15,7 +15,7 @@ class Opponents(BaseModel):
     price_change: float = 0.0
 
 
-class Goods(BaseModel):
+class Item(BaseModel):
     """Наши товары, на конкурентов храним ссылки"""
 
     sku: str = ""
@@ -23,4 +23,4 @@ class Goods(BaseModel):
     url: str = ""
     price: float = 0.0
     opponents_id: List[str] = []
-    timestamp:datetime.datetime 
+    timestamp: datetime.datetime

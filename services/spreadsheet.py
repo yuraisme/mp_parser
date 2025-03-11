@@ -32,15 +32,12 @@ class GoogleSheetsClient:
             except Exception as e:
                 logger.error(f"Problem to acces to speadsheets: {e}")
                 # raise ExceptGsheetApi
-
         else:
             logger.error("Where no sheet id name")
             # raise ExceptGsheetApi
 
     def _authenticate(self):
-        """
-        Аутентификация через сервисный аккаунт.
-        """
+        """Аутентификация через сервисный аккаунт."""
         scope = [
             "https://spreadsheets.google.com/feeds",
             "https://www.googleapis.com/auth/spreadsheets",
@@ -52,8 +49,8 @@ class GoogleSheetsClient:
         )
         return gspread.authorize(creds)
 
-    def get_sheet_data(self, worksheet_name: str) -> List[List[str]]:
-        worksheet = self.sheet.worksheet(worksheet_name)
+    def get_sheet_data(self) -> List[List[str]]:
+        worksheet = self.sheet.sheet1
         return worksheet.get_all_values()
 
 
@@ -87,15 +84,21 @@ def get_wb_art(url: str | None = None) -> str | None:
 
 if __name__ == "__main__":
     client = GoogleSheetsClient(
-        os.path.join(os.getcwd(), "parsing", "services", "credentials.json"),
+        os.path.join(os.getcwd(), "services", "credentials.json"),
         SHEET_ID,
     )
 
     if client.authorised:
-        data = client.get_sheet_data("Лист1")
-        for _ in data[2:]:
+        # data = client.get_sheet_data("Лист1")
+        data = client.sheet.sheet1.get_all_values()
+        print(data[0])
+        # data1 = client.sheet.sheet1.get_all_values(f"C3:")
+        exit()
+        for _ in data:
             try:
-                print(get_wb_art(_[2]))
+                if _ != [""]:
+                    # print(get_ozon_art(_[0]))
+                    print(get_wb_art(_[0]))
             except:
                 pass
         # print(data)

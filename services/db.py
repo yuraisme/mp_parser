@@ -39,7 +39,7 @@ import sqlite3
 
 from loguru import logger
 
-from ..models import Goods, Opponents
+from ..models import Item, Opponents
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 db_path = os.path.join(BASE_DIR, "db.sqlite3")
@@ -70,19 +70,19 @@ def db_connection(func):
 
 
 @db_connection
-def add_good(good: Goods, curs: sqlite3.Cursor | None = None) -> bool | None:
+def add_good(item: Item, curs: sqlite3.Cursor | None = None) -> bool | None:
     if curs is not None:
         sql_check = "SELECT COUNT(*) FROM goods WHERE sku = ?"
-        curs.execute(sql_check, (good.sku,))
+        curs.execute(sql_check, (item.sku,))
         if curs.fetchone()[0] > 0:
-            logger.warning(f"Товар с SKU {good.sku} уже существует в базе")
+            logger.warning(f"Товар с SKU {item.sku} уже существует в базе")
             return None
         sql_insert = "INSERT INTO goods (sku, name, url, price, timestamp) VALUES (?, ?, ?, ?, ?)"
         curs.execute(
             sql_insert,
-            (good.sku, good.name, good.url, good.price, good.timestamp),
+            (item.sku, item.name, item.url, item.price, item.timestamp),
         )
-        logger.info(f"Товар с SKU {good.sku} успешно добавлен.")
+        logger.info(f"Товар с SKU {item.sku} успешно добавлен.")
         return True
 
 
@@ -187,4 +187,4 @@ if __name__ == "__main__":
         ),
     )
     remove_opponent("123")
-    remove_good('2323234324')
+    remove_good("2323234324")
