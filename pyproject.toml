@@ -5,8 +5,10 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "drissionpage>=4.1.0.17",
     "gspread>=6.2.0",
     "loguru>=0.7.3",
+    "mypy>=1.15.0",
     "pydantic>=2.10.6",
     "pytest>=8.3.5",
     "python-dotenv>=1.0.1",

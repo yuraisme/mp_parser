@@ -1,6 +1,8 @@
 import os
 import re
+from datetime import datetime, timedelta
 from typing import List
+from zoneinfo import ZoneInfo
 
 import gspread
 from dotenv import load_dotenv
@@ -52,6 +54,17 @@ class GoogleSheetsClient:
     def get_sheet_data(self) -> List[List[str]]:
         worksheet = self.sheet.sheet1
         return worksheet.get_all_values()
+
+    def update_master(
+        self, row: int, col: int, name: str, price: int, sku: str
+    ):
+        self.sheet.sheet1.update_cell(row, 1, sku)
+        self.sheet.sheet1.update_cell(row, 2, name)
+        self.sheet.sheet1.update_cell(row, 4, price)
+        time = datetime.now(ZoneInfo("Asia/Yekaterinburg")).strftime(
+            "%d.%m.%Y %H:%M:%S"
+        )
+        self.sheet.sheet1.update_cell(row, 9, time)
 
 
 def get_sku(url: str | None = None) -> str | None:

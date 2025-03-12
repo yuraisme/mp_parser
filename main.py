@@ -1,13 +1,16 @@
 import datetime
 import os
+import time
 from http import client
 from time import strftime
 from typing import List
+from urllib import response
 
 from dotenv import load_dotenv
 from loguru import logger
 
 from models import Item, Opponents
+from services.parser import Parser
 from services.spreadsheet import GoogleSheetsClient, get_sku
 
 load_dotenv()
@@ -58,26 +61,36 @@ if __name__ == "__main__":
     gs_data = google_sheet.get_sheet_data()
     n_row = 2
     goods: List[Item] = []
-    while n_row <= len(gs_data) - 2:
-        if (
-            "ozon.ru" in gs_data[n_row][2]
-            or "wildberries.ru" in gs_data[n_row][2]
-        ):
-            goods.append(
-                Item(
-                    sku=get_sku(gs_data[n_row][2]) or "",
-                    name=gs_data[n_row][1],
-                    timestamp=datetime.datetime.now(),
-                )
-            )
-            n_row += 1
-            while gs_data[n_row][2] == "" and gs_data[n_row][7] != "":
-                if get_sku(gs_data[n_row][7]):
-                    goods[len(goods) - 1].opponents_id.append(
-                        get_sku(gs_data[n_row][7])
-                    )
-                n_row += 1
-                if n_row >= len(gs_data):
+    parser = Parser(headless=True)
+
+    for n_row, row in enumerate(gs_data):
+        try:
+            orig_url = row[2]
+            for i in range(3):
+                if "ozon" in orig_url:
+                    response = parser.get_ozon_price(orig_url)
+                elif "wildberries" in orig_url:
+                    response = parser.get_wb_price(orig_url)
+                else:
                     break
-        n_row += 1
-    print(goods)
+                if response:
+                    print(response)
+                    google_sheet.update_master(
+                        n_row + 1,
+                        2,
+                        response["Name"],
+                        response["Price"],
+                        get_sku(orig_url),
+                    )
+                    break
+                else:
+                    time.sleep(2)
+                    try:
+                        print(get_sku(orig_url))
+                    except:
+                        break
+
+        except Exception as e:
+            logger.error(f"Error {e}")
+    # for _ in goods:
+    #     print(_)
