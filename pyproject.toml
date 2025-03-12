@@ -13,3 +13,8 @@ dependencies = [
     "pytest>=8.3.5",
     "python-dotenv>=1.0.1",
 ]
+
+[tool.black]
+line-length = 79  # Ограничение длины строки (PEP 8)
+target-version = ['py311', 'py312']  # Версия Python
+skip-magic-trailing-comma = true  # Отключает автоматический перенос при длинных списках

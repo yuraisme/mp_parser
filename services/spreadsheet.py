@@ -1,16 +1,18 @@
+import datetime
 import os
 import re
-from datetime import datetime, timedelta
 from typing import List
 from zoneinfo import ZoneInfo
 
 import gspread
 from dotenv import load_dotenv
 from google.oauth2.service_account import Credentials
+from gspread import Cell
 from loguru import logger
 
 load_dotenv()
 SHEET_ID = os.getenv("SPREADSHEET_ID")
+TIME_ZONE = datetime.timezone(datetime.timedelta(hours=5))  #  (UTC+5)
 
 
 class GoogleSheetsClient:
@@ -55,16 +57,18 @@ class GoogleSheetsClient:
         worksheet = self.sheet.sheet1
         return worksheet.get_all_values()
 
-    def update_master(
-        self, row: int, col: int, name: str, price: int, sku: str
-    ):
-        self.sheet.sheet1.update_cell(row, 1, sku)
-        self.sheet.sheet1.update_cell(row, 2, name)
-        self.sheet.sheet1.update_cell(row, 4, price)
-        time = datetime.now(ZoneInfo("Asia/Yekaterinburg")).strftime(
+    def update_master(self, row: int, name: str, price: int, sku: str):
+        timestamp = datetime.datetime.now(TIME_ZONE).strftime(
             "%d.%m.%Y %H:%M:%S"
         )
-        self.sheet.sheet1.update_cell(row, 9, time)
+
+        cells = [
+            Cell(row, 1, sku),  # A
+            Cell(row, 2, name),  # B
+            Cell(row, 4, str(price)),  # D
+            Cell(row, 9, timestamp),  # I
+        ]
+        self.sheet.sheet1.update_cells(cells)
 
 
 def get_sku(url: str | None = None) -> str | None:

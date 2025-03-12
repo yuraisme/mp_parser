@@ -73,7 +73,7 @@ class Parser:
 
         if not isinstance(self.tab, str):
             try:
-                logger.info("loading page....")
+                logger.info("loading page ozon....")
                 if self.tab.get(url):
                     res = (
                         self.tab.eles("tag:span")
@@ -143,4 +143,4 @@ if __name__ == "__main__":
         "https://www.wildberries.ru/catalog/272792079/detail.aspx"
     )
     print(res)
-    logger.info('End')
+    logger.info("End")
