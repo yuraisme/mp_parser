@@ -31,6 +31,9 @@ class Parser:
         )
 
         self.co.set_argument("--window-size", window_size)
+        self.co.set_argument("--blink-settings=autoplayPolicy=DocumentUserActivationRequired")
+        self.co.set_argument("--disable-accelerated-video-decode")
+        self.co.set_argument("--disable-gpu")
         # co.set_browser_path(r"chromium\bin\chrome.exe")
         self.co.headless(headless)
         self.co.no_imgs(True).mute(True)
@@ -64,6 +67,15 @@ class Parser:
                             marketplace_response[0:ruble_index].split()
                         )
         return None
+
+    def get_data(self, url):
+        match url:
+            case url if "ozon" in url:
+                return self.get_ozon_price(url)
+            case url if "wildberries" in url:
+                return self.get_wb_price(url)
+            case _:
+                return None
 
     def get_ozon_price(self, url: str) -> dict[str, int | str] | None:
         try:

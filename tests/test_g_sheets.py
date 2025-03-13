@@ -1,80 +1,64 @@
+import unittest
 from unittest.mock import MagicMock, patch
 
-import pytest
-
-from services.spreadsheet import GoogleSheetsClient, get_ozon_art, get_wb_art
+from services.spreadsheet import GoogleSheetsClient, get_sku
 
 
-@pytest.fixture
-def mock_gspread():
-    """Создает заглушку для gspread"""
-    with patch("parsing.services.spreadsheet.gspread") as mock_gspread:
-        yield mock_gspread
+class TestGoogleSheetsClient(unittest.TestCase):
+
+    @patch("services.spreadsheet.Credentials.from_service_account_file")
+    @patch("services.spreadsheet.gspread.authorize")
+    def test_authentication(self, mock_authorize, mock_creds):
+        mock_client = MagicMock()
+        mock_authorize.return_value = mock_client
+        client = GoogleSheetsClient("test_credentials.json", "test_sheet_id")
+        self.assertTrue(client.authorised)
+        self.assertIsNotNone(client.sheet)
+
+    @patch("services.spreadsheet.GoogleSheetsClient._authenticate")
+    def test_get_sheet_data(self, mock_authenticate):
+        mock_client = MagicMock()
+        mock_authenticate.return_value = mock_client
+        mock_client.open_by_key().sheet1.get_all_values.return_value = [
+            ["Test Data"]
+        ]
+
+        client = GoogleSheetsClient("test_credentials.json", "test_sheet_id")
+        data = client.get_sheet_data()
+        self.assertEqual(data, [["Test Data"]])
+
+    @patch("services.spreadsheet.GoogleSheetsClient._authenticate")
+    def test_update_master(self, mock_authenticate):
+        mock_client = MagicMock()
+        mock_authenticate.return_value = mock_client
+        client = GoogleSheetsClient("test_credentials.json", "test_sheet_id")
+
+        client.update_master(1, "Test Name", 100, "12345")
+        mock_client.open_by_key().sheet1.update_cells.assert_called_once()
 
 
-@pytest.fixture
-def mock_credentials():
-    """Создает заглушку для Credentials"""
-    with patch("parsing.services.spreadsheet.Credentials") as mock_creds:
-        yield mock_creds
+class TestGetSkuFunction(unittest.TestCase):
+    def test_get_sku_valid_ozon(self):
+        url = "https://www.ozon.ru/product/test-product-12345678/"
+        sku = get_sku(url)
+        self.assertEqual(sku, "12345678")
+
+    def test_get_sku_valid_wb(self):
+        url = "https://www.wildberries.ru/catalog/12345678/detail"
+        sku = get_sku(url)
+        self.assertEqual(sku, "12345678")
+
+    def test_get_sku_invalid_url(self):
+        url = "https://www.example.com"
+        with self.assertRaises(ValueError):
+            get_sku(url)
+
+    def test_get_sku_no_url(self):
+        with self.assertRaises(ValueError):
+            get_sku()
 
 
-
-
-@pytest.mark.parametrize(
-    "url, expected",
-    [
-        (
-            "https://www.ozon.ru/product/vneshniy-akkumulyator-123456789/",
-            "123456789",
-        ),
-        ("https://www.ozon.ru/product/item-987654321/", "987654321"),
-        ("https://www.ozon.ru/product/other-5634821/", "5634821"),
-        ("https://www.ozon.ru/category/some-other-url/", None),
-    ],
-)
-def test_get_ozon_art(url, expected):
-    """Тестирование извлечения артикула Ozon"""
-    assert get_ozon_art(url) == expected
-
-
-@pytest.mark.parametrize(
-    "url, expected",
-    [
-        (
-            "https://www.wildberries.ru/catalog/12295464/detail.aspx",
-            "12295464",
-        ),
-        ("https://www.wildberries.ru/catalog/999999/detail.aspx", "999999"),
-        (
-            "https://www.wildberries.ru/catalog/54321/detail.aspx?extra=data",
-            "54321",
-        ),
-        ("https://www.wildberries.ru/other-page", None),
-    ],
-)
-def test_get_wb_art(url, expected):
-    """Тестирование извлечения артикула Wildberries"""
-    assert get_wb_art(url) == expected
-
-
-def test_get_ozon_art_invalid_url():
-    """Тестирование обработки некорректных URL Ozon"""
-    with pytest.raises(ValueError, match="No url for ozon SKU"):
-        get_ozon_art()
-
-    with pytest.raises(ValueError, match="No CORRECT url for ozon SKU"):
-        get_ozon_art("https://www.example.com/product/123")
-
-
-def test_get_wb_art_invalid_url():
-    """Тестирование обработки некорректных URL Wildberries"""
-    with pytest.raises(ValueError, match="No url for wildberries SKU"):
-        get_wb_art("")
-
-    with pytest.raises(
-        ValueError, match="No CORRECT url for wildberries SKU"
-    ):
-        get_wb_art("https://www.example.com/catalog/456")
-        get_wb_art("https://www.example.com/catalog/456")
-        get_wb_art("https://www.example.com/catalog/456")
+if __name__ == "__main__":
+    unittest.main()
+if __name__ == "__main__":
+    unittest.main()

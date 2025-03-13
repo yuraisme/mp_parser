@@ -70,6 +70,25 @@ class GoogleSheetsClient:
         ]
         self.sheet.sheet1.update_cells(cells)
 
+    def update_slave(self, row: int, price: str, prev_price: str):
+        timestamp = datetime.datetime.now(TIME_ZONE).strftime(
+            "%d.%m.%Y %H:%M:%S"
+        )
+        diff_price = (
+            str(int(prev_price) - int(price)) if prev_price != "" else "0"
+        )
+
+        cells = [
+            Cell(row, 5, price),  # E
+            Cell(row, 6, prev_price),  # F
+            Cell(row, 7, diff_price),  # G
+            Cell(row, 9, timestamp),  # I
+        ]
+        self.sheet.sheet1.update_cells(cells)
+
+    def set_no_valid(self, row: int, column: int):
+        self.sheet.sheet1.update_cell(row, column, "не валидная ссылка")
+
 
 def get_sku(url: str | None = None) -> str | None:
     """return article as string"""
@@ -89,19 +108,6 @@ def get_sku(url: str | None = None) -> str | None:
     # не случилось ни одного совпадения
     logger.error("No CORRECT url for ozon/WB SKU")
     raise ValueError("No CORRECT url for ozon/WB SKU")
-
-
-def get_wb_art(url: str | None = None) -> str | None:
-    pattern = r"https:\/\/www\.wildberries\.ru\/catalog\/(\d+)\/detail"
-    if not url:
-        logger.error("No url for wildberries SKU")
-        raise ValueError("No url for wildberries SKU")
-    if "wildberries.ru" not in url.lower():
-        logger.error("No CORRECT url for wildberries SKU")
-        raise ValueError("No CORRECT url for wildberries SKU")
-    match = re.search(pattern, url)
-    if match:
-        return match.group(1)
 
 
 if __name__ == "__main__":
