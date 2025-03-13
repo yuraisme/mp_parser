@@ -19,9 +19,54 @@ class Telebot:
             sys.exit(1)
         self.bot = telebot.TeleBot(self.token)
 
-    def send_message(self, message: str) -> bool | None:
+    def send_message(self, url: str, price_prev: str, price_current: str):
+        if price_prev == price_current:
+            return None
+        if int(price_prev) < int(price_current):
+            logger.info("Sending message about prise rising...")
+            self.send_rise_message(url, price_prev, price_current)
+            return True
+
+        if int(price_prev) > int(price_current):
+            logger.info("Sending message about prise falling...")
+            self.send_fall_message(url, price_prev, price_current)
+            return True
+
+            pass
+
+    def send_rise_message(
+        self, url: str, price_prev: str, price_current: str
+    ) -> bool | None:
         try:
-            self.bot.send_message(chat_id=self.group_id, text=message)
+            diff = int(price_current) - int(price_prev)
+            diff_percent = round(int(price_current) / int(price_prev), 1)
+            message = (
+                f"Цена на [товар]({url}) конкурента\n"
+                f"⬆️ Выросла с *{price_prev} ₽* до *{price_current} ₽*\n"
+                f"📊 Разница  `{diff} ₽ ({diff_percent}%)`"
+            )
+            self.bot.send_message(
+                chat_id=self.group_id, parse_mode="Markdown", text=message
+            )
+            logger.success("Bot successfully sent a message to the group")
+            return True
+        except Exception as e:
+            logger.error(f"Error during bot sending message: {e}")
+
+    def send_fall_message(
+        self, url: str, price_prev: str, price_current: str
+    ) -> bool | None:
+        try:
+            diff = int(price_current) - int(price_prev)
+            diff_percent = round(int(price_prev) / int(price_current), 1)
+            message = (
+                f"Цена на [товар]({url}) конкурента\n"
+                f"⬇️ Упала с *{price_prev} ₽* до *{price_current} ₽*\n"
+                f"📊 Разница  `{diff} ₽ ({diff_percent * -1}%)`"
+            )
+            self.bot.send_message(
+                chat_id=self.group_id, parse_mode="Markdown", text=message
+            )
             logger.success("Bot successfully sent a message to the group")
             return True
         except Exception as e:
@@ -32,5 +77,8 @@ if __name__ == "__main__":
     # Собираем текст сообщения из аргументов командной строки
     message_text = "test message"
     bot = Telebot()
-    bot.send_message(message_text)
-    bot.send_message(message_text)
+    bot.send_message(
+        "https://www.ozon.ru/product/chesalka-dlya-tela-teleskopicheskaya-massazher-dlya-spiny-1400285112/?at=pZtpw3j31FxXrWkqU3vwr9pimJvYN1fXm8JvocyoDJKE&avtc=1&avte=4&avts=1738053903&keywords=%D1%87%D0%B5%D1%81%D0%B0%D0%BB%D0%BA%D0%B0+%D0%B4%D0%BB%D1%8F+%D1%81%D0%BF%D0%B8%D0%BD%D1%8B",
+        "148",
+        "148",
+    )
