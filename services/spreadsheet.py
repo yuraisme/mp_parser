@@ -57,7 +57,7 @@ class GoogleSheetsClient:
         worksheet = self.sheet.sheet1
         return worksheet.get_all_values()
 
-    def update_master(self, row: int, name: str, price: int, sku: str):
+    def update_master(self, row: int, name: str, price: str, sku: str):
         timestamp = datetime.datetime.now(TIME_ZONE).strftime(
             "%d.%m.%Y %H:%M:%S"
         )
@@ -65,7 +65,7 @@ class GoogleSheetsClient:
         cells = [
             Cell(row, 1, sku),  # A
             Cell(row, 2, name),  # B
-            Cell(row, 4, str(price)),  # D
+            Cell(row, 4, price),  # D
             Cell(row, 9, timestamp),  # I
         ]
         self.sheet.sheet1.update_cells(cells)
@@ -74,9 +74,11 @@ class GoogleSheetsClient:
         timestamp = datetime.datetime.now(TIME_ZONE).strftime(
             "%d.%m.%Y %H:%M:%S"
         )
-        diff_price = (
-            str(int(prev_price) - int(price)) if prev_price != "" else "0"
-        )
+        diff_price = "0"
+        if price != "" and prev_price != "":
+            diff_price = (
+                str(int(price) - int(prev_price)) if prev_price != "" else "0"
+            )
 
         cells = [
             Cell(row, 5, price),  # E
@@ -86,8 +88,8 @@ class GoogleSheetsClient:
         ]
         self.sheet.sheet1.update_cells(cells)
 
-    def set_no_valid(self, row: int, column: int):
-        self.sheet.sheet1.update_cell(row, column, "не валидная ссылка")
+    def set_no_valid(self, row: int):
+        self.sheet.sheet1.update_cell(row, 10, "! НЕВАЛИДНАЯ ССЫЛКА !")
 
 
 def get_sku(url: str | None = None) -> str | None:

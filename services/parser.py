@@ -31,7 +31,9 @@ class Parser:
         )
 
         self.co.set_argument("--window-size", window_size)
-        self.co.set_argument("--blink-settings=autoplayPolicy=DocumentUserActivationRequired")
+        self.co.set_argument(
+            "--blink-settings=autoplayPolicy=DocumentUserActivationRequired"
+        )
         self.co.set_argument("--disable-accelerated-video-decode")
         self.co.set_argument("--disable-gpu")
         # co.set_browser_path(r"chromium\bin\chrome.exe")
@@ -77,7 +79,7 @@ class Parser:
             case _:
                 return None
 
-    def get_ozon_price(self, url: str) -> dict[str, int | str] | None:
+    def get_ozon_price(self, url: str) -> dict[str, str] | None:
         try:
             self.tab = self.browser.latest_tab
         except Exception as e:
@@ -87,13 +89,10 @@ class Parser:
             try:
                 logger.info("loading page ozon....")
                 if self.tab.get(url):
-                    res = (
-                        self.tab.eles("tag:span")
-                        .filter_one.style("border-radius", "8px")
-                        .text
-                    )
+                    res = self.tab.ele(
+                        'xpath://div[@data-widget="webPrice"]'
+                    ).text
                     price = self._parse_price(res)
-
                     res = (
                         self.tab.ele(
                             'xpath://div[@data-widget="webProductHeading"]'
@@ -104,7 +103,7 @@ class Parser:
                     name = res
                     if price:
                         if price.isdigit():
-                            return {"Price": int(price), "Name": name}
+                            return {"Price": price, "Name": name}
             except ElementNotFoundError:
                 logger.error(
                     f"No element find on the page - page does not exits or wrong"
@@ -115,7 +114,7 @@ class Parser:
             return None
         return None
 
-    def get_wb_price(self, url: str) -> dict[str, int | str] | None:
+    def get_wb_price(self, url: str) -> dict[str, str] | None:
         try:
             self.tab = self.browser.latest_tab
         except Exception as e:
@@ -126,13 +125,12 @@ class Parser:
                 logger.info("loading page wb....")
                 if self.tab.get(url):
                     res = self.tab.ele("@class=price-block__price")
-
                     price = self._parse_price(res.text)
                     res = self.tab.ele("@class=product-page__title")
                     name = res.text
                     if price:
                         if price.isdigit():
-                            return {"Price": int(price), "Name": name}
+                            return {"Price": price, "Name": name}
             except ElementNotFoundError:
                 logger.error(
                     f"No element find on the page - page does not exits or wrong"
@@ -147,12 +145,12 @@ class Parser:
 if __name__ == "__main__":
     parser = Parser()
     res = parser.get_ozon_price(
-        "https://www.ozon.ru/product/beprovodnaya-mysh-acer-omr130-chernyy-1200dpi-usb-3-knopki-553649011/"
+        "https://www.ozon.ru/product/makarony-makfa-makfa-rozhki-gladkie-vysshiy-sort-400g-makaronnye-izdeliya-komplekt-iz-4-sht-197877686/"
     )
     print(res)
 
-    res = parser.get_wb_price(
-        "https://www.wildberries.ru/catalog/272792079/detail.aspx"
-    )
-    print(res)
+    # res = parser.get_wb_price(
+    #     "https://www.wildberries.ru/catalog/272792079/detail.aspx"
+    # )
+    # print(res)
     logger.info("End")
