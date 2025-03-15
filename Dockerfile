@@ -5,17 +5,19 @@ FROM python:3.13-bookworm
 RUN apt-get -y update
     # Install Chrome.
 RUN  apt install chromium -y
-RUN  apt upgrade -y
+# RUN  apt upgrade -y
  # RUN  apt install chromium-chromedriver -y
-# Install ChromeDriver.
-RUN apt-get install unzip 
-RUN wget -N https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip
-RUN unzip chromedriver_linux64.zip
-RUN chmod +x chromedriver
 
-RUN mv -f chromedriver /usr/local/share/chromedriver
-RUN ln -s /usr/local/share/chromedriver /usr/local/bin/chromedriver
-RUN ln -s /usr/local/share/chromedriver /usr/bin/chromedriver
+
+ # Install ChromeDriver.
+# RUN apt-get install unzip 
+# RUN wget -N https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip
+# RUN unzip chromedriver_linux64.zip
+# RUN chmod +x chromedriver
+
+# RUN mv -f chromedriver /usr/local/share/chromedriver
+# RUN ln -s /usr/local/share/chromedriver /usr/local/bin/chromedriver
+# RUN ln -s /usr/local/share/chromedriver /usr/bin/chromedriver
 
 RUN pip install uv
 
