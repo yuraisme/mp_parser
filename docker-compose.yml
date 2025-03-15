@@ -1,0 +1,8 @@
+services:
+  parsing:
+    build: .
+    container_name: parsing_app
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: ["python", "main.py"]

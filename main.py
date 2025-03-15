@@ -45,18 +45,21 @@ if __name__ == "__main__":
 
                     """но если невалидная - сдаёмся после певого раза """
                     if i > 0 and row[9] == "! НЕВАЛИДНАЯ ССЫЛКА !":
-                        logger.warning("already invalid - exit from trying")
+                        logger.warning(
+                            "Url already invalid - exit from trying"
+                        )
                         break
-                    if len(row[2]) > 10:  # наша ссылка
+                    """наша ссылка"""
+                    if len(row[2]) > 10:  # проверка на вшивость
                         if response := parser.get_data(url):
-                            print(response)
+                            # print(response)
+                            logger.info(f"Send {response} to google sheet")
                             google_sheet.update_master(
                                 n_row + 3,
                                 response["Name"],
                                 response["Price"],
                                 get_sku(url),
                             )
-
                             break
                         else:
                             time.sleep(random.randrange(3, 5))
@@ -66,10 +69,11 @@ if __name__ == "__main__":
                                     google_sheet.set_no_valid(n_row + 3, 2)
                             except:
                                 break
-
-                    if len(row[7]) > 10:  # ссылка конкурентов
+                    """ссылка конкурентов"""
+                    if len(row[7]) > 10:  # проверка на вшивость
                         if response := parser.get_data(url):
-                            print(response)
+                            # print(response)
+                            logger.info(f"Send {response} to google sheet")
                             google_sheet.update_slave(
                                 row=n_row + 3,
                                 price=response["Price"],
