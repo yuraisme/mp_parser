@@ -4,14 +4,10 @@ FROM python:3.13-bookworm
 # Устанавливаем зависимости для Chromium
 RUN apt-get -y update
     # Install Chrome.
-RUN  apt install chromium wget -y
+RUN  apt install chromium chromium-chromedriver -y
+RUN  apt-get install chromium-chromedriver -y
 # Install ChromeDriver.
-RUN wget -N http://chromedriver.storage.googleapis.com/$CHROME_DRIVER_VERSION/chromedriver_linux64.zip -P ~/
-RUN unzip ~/chromedriver_linux64.zip -d ~/ 
-RUN rm ~/chromedriver_linux64.zip 
-RUN mv -f ~/chromedriver /usr/local/bin/chromedriver 
-RUN chown root:root /usr/local/bin/chromedriver 
-RUN chmod 0755 /usr/local/bin/chromedriver
+
 
 RUN pip install uv
 
