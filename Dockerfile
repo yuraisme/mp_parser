@@ -4,8 +4,7 @@ FROM python:3.13
 # Устанавливаем зависимости для Chromium
 RUN apt-get -y update
     # Install Chrome.
-RUN apt-get -y install chromium-browser
-
+RUN  apt install chromium-browser -y
 # Install ChromeDriver.
 RUN wget -N http://chromedriver.storage.googleapis.com/$CHROME_DRIVER_VERSION/chromedriver_linux64.zip -P ~/ \
 unzip ~/chromedriver_linux64.zip -d ~/ \
