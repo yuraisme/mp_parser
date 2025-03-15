@@ -1,8 +1,9 @@
 import os
 import random
+import time
 
 from dotenv import load_dotenv
-from DrissionPage import Chromium, ChromiumPage
+from DrissionPage import Chromium
 from DrissionPage.common import ChromiumOptions, Settings
 from DrissionPage.errors import BrowserConnectError, ElementNotFoundError
 from loguru import logger
@@ -34,6 +35,7 @@ class Parser:
         self.co.set_argument(
             "--blink-settings=autoplayPolicy=DocumentUserActivationRequired"
         )
+        self.co.set_argument("--no-sandbox")
         self.co.set_argument("--disable-accelerated-video-decode")
         self.co.set_argument("--disable-gpu")
         # co.set_browser_path(r"chromium\bin\chrome.exe")
@@ -43,20 +45,26 @@ class Parser:
         self.co.set_user_agent(
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36"
         )
-        try:
-            self.browser = Chromium(self.co)
-        except BrowserConnectError:
-            logger.error(
-                "can't connect to browser - killing browser process..."
-            )
-            kill_chromium_processes()
+        self.browser = None
+        while not self.browser:
+            try:
+                self.browser = Chromium(self.co)
+            except BrowserConnectError:
+                logger.error(
+                    "can't connect to browser - try killing browser process..."
+                )
+                kill_chromium_processes()
+                time.sleep(3)
+
         # self.co.set_argument('--disable-image-animation')
         # self.co.save(path=r"settings.ini")
 
     def __del__(self):
         # self.browser.quit()
         kill_chromium_processes()
-        logger.info("Object was delete")
+        logger.info(
+            "Parser object was deleted, chromium process has been killed"
+        )
 
     def _parse_price(self, marketplace_response: str | None) -> str | None:
         """универсальная для ozon и wb"""
@@ -83,7 +91,7 @@ class Parser:
         try:
             self.tab = self.browser.latest_tab
         except Exception as e:
-            logger.error("problem then open tab: {e}")
+            logger.error(f"problem then open tab: {e}")
 
         if not isinstance(self.tab, str):
             try:
@@ -98,11 +106,11 @@ class Parser:
                             'xpath://div[@data-widget="webProductHeading"]'
                         )
                         .ele("tag:h1")
-                        .text
+                        .text  # type: ignore
                     )
                     name = res
                     if price:
-                        if price.isdigit():
+                        if price.isdigit() and isinstance(price, str):
                             return {"Price": price, "Name": name}
             except ElementNotFoundError:
                 logger.error(
@@ -118,7 +126,7 @@ class Parser:
         try:
             self.tab = self.browser.latest_tab
         except Exception as e:
-            logger.error("problem then open tab: {e}")
+            logger.error(f"problem then open tab: {e}")
 
         if not isinstance(self.tab, str):
             try:

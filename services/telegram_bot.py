@@ -25,9 +25,6 @@ class Telebot:
             or price_prev == ""
             or price_current == ""
         ):
-            # logger.warning(
-            #     f"Not valid price Prev{price_prev} current {price_current}"
-            # )
             return None
 
         logger.info("Price was change ↓↓↓")

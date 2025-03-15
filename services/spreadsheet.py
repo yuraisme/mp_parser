@@ -2,7 +2,6 @@ import datetime
 import os
 import re
 from typing import List
-from zoneinfo import ZoneInfo
 
 import gspread
 from dotenv import load_dotenv
@@ -124,11 +123,3 @@ if __name__ == "__main__":
         print(data[0])
         # data1 = client.sheet.sheet1.get_all_values(f"C3:")
         exit()
-        for _ in data:
-            try:
-                if _ != [""]:
-                    # print(get_ozon_art(_[0]))
-                    print(get_wb_art(_[0]))
-            except:
-                pass
-        # print(data)

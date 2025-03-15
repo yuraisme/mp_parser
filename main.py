@@ -1,14 +1,11 @@
-import datetime
 import os
 import random
+import sys
 import time
-from typing import List
-from urllib import response
 
 from dotenv import load_dotenv
 from loguru import logger
 
-from models import Item, Opponents
 from services.parser import Parser
 from services.spreadsheet import GoogleSheetsClient, get_sku
 from services.telegram_bot import Telebot
@@ -17,22 +14,16 @@ load_dotenv()
 SHEET_ID = os.getenv("SPREADSHEET_ID") or ""
 
 
-def main():
-    print("Hello from parsing!")
-
-
-if __name__ == "__main__":
-    # main()
-    # refresh_items(SHEET_ID)
-    # print(data)
+def main(headless: bool = True):
     google_sheet = GoogleSheetsClient(
         os.path.join(os.getcwd(), "services", "credentials.json"),
         SHEET_ID,
     )
-    parser = Parser(headless=True)
+    parser = Parser(headless)
+
     bot = Telebot()
-    prev_time = datetime.datetime.now()
-    for i in range(10000):
+    while True:
+        logger.info("*************Start from Begin Google Sheet*************")
         gs_data = google_sheet.get_sheet_data()
         for n_row, row in enumerate(gs_data[2:]):
             try:
@@ -66,7 +57,10 @@ if __name__ == "__main__":
                             try:
                                 print(get_sku(url))
                                 if i == 2:
-                                    google_sheet.set_no_valid(n_row + 3, 2)
+                                    google_sheet.set_no_valid(n_row + 3)
+                                    logger.warning(
+                                        f"Looks like {get_sku(url)} not valid"
+                                    )
                             except:
                                 break
                     """ссылка конкурентов"""
@@ -87,13 +81,21 @@ if __name__ == "__main__":
                                 print(get_sku(url))
                                 if i == 2:
                                     google_sheet.set_no_valid(n_row + 3)
+                                    logger.warning(
+                                        f"Looks like {get_sku(url)} not valid"
+                                    )
                             except:
                                 break
-
+            except KeyboardInterrupt:
+                logger.warning("Exit at the user's request")
+                sys.exit(0)
             except Exception as e:
                 logger.error(f"Error {e}")
-        logger.info("=======End of Google SHeet. Start Again========")
+        logger.info("===========End of Google Sheet. Start Again===========")
         time.sleep(5)
-        print(datetime.datetime.now() - prev_time)
-        # for _ in goods:
-        #     print(_)
+
+
+if __name__ == "__main__":
+    main(headless=True)
+    # refresh_items(SHEET_ID)
+    # print(data)
