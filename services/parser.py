@@ -32,15 +32,17 @@ class Parser:
         )
 
         self.co.set_argument("--window-size", window_size)
-        self.co.set_argument(
-            "--blink-settings=autoplayPolicy=DocumentUserActivationRequired"
-        )
-        self.co.set_argument("--no-sandbox")
-        self.co.set_argument("--disable-accelerated-video-decode")
-        self.co.set_argument("--disable-gpu")
-        # co.set_browser_path(r"chromium\bin\chrome.exe")
+        
+        # self.co.set_argument(
+        #     "--blink-settings=autoplayPolicy=DocumentUserActivationRequired"
+        # )
+        # self.co.set_argument("--no-sandbox")
+        # self.co.set_argument("--disable-accelerated-video-decode")
+        # self.co.set_argument("--disable-gpu")
+        # # co.set_browser_path(r"chromium\bin\chrome.exe")
         self.co.headless(headless)
         self.co.no_imgs(True).mute(True)
+        self.co.set_paths(address="chromium", local_port='9222')
 
         self.co.set_user_agent(
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36"
@@ -49,6 +51,7 @@ class Parser:
         while not self.browser:
             try:
                 self.browser = Chromium(self.co)
+
             except BrowserConnectError:
                 logger.error(
                     "can't connect to browser - try killing browser process..."

@@ -1,10 +1,6 @@
-# Базовый образ с Python 3.13
-FROM python:3.13-bookworm
+FROM python:3.13-slim
 
-# Устанавливаем зависимости для Chromium
-RUN apt-get -y update
-    # Install Chrome.
-RUN  apt install chromium -y
+RUN apt-get update
 # RUN  apt upgrade -y
  # RUN  apt install chromium-chromedriver -y
 
@@ -27,7 +23,6 @@ WORKDIR /app
 # Копируем файлы проекта
 COPY . .
 
-ENV PATH="/usr/lib/chromium/:${PATH}"
 # Создаём виртуальное окружение и устанавливаем зависимости через UV
 RUN uv sync
 # Указываем переменные окружения
