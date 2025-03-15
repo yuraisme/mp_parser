@@ -1,5 +1,5 @@
 # Базовый образ с Python 3.13
-FROM python:3.13
+FROM python:3.13-bookworm
 
 # Устанавливаем зависимости для Chromium
 RUN apt-get -y update
