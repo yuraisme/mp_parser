@@ -4,10 +4,7 @@ FROM python:3.13
 # Устанавливаем зависимости для Chromium
 RUN apt-get -y update
     # Install Chrome.
-RUN curl -sS -o - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add \
-echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list \
-apt-get -y update \
-apt-get -y install chromium-browser
+RUN apt-get -y install chromium-browser
 
 # Install ChromeDriver.
 RUN wget -N http://chromedriver.storage.googleapis.com/$CHROME_DRIVER_VERSION/chromedriver_linux64.zip -P ~/ \
