@@ -6,12 +6,12 @@ RUN apt-get -y update
     # Install Chrome.
 RUN  apt install chromium wget -y
 # Install ChromeDriver.
-RUN wget -N http://chromedriver.storage.googleapis.com/$CHROME_DRIVER_VERSION/chromedriver_linux64.zip -P ~/ \
-unzip ~/chromedriver_linux64.zip -d ~/ \
-rm ~/chromedriver_linux64.zip \
-mv -f ~/chromedriver /usr/local/bin/chromedriver \
-chown root:root /usr/local/bin/chromedriver \
-chmod 0755 /usr/local/bin/chromedriver
+RUN wget -N http://chromedriver.storage.googleapis.com/$CHROME_DRIVER_VERSION/chromedriver_linux64.zip -P ~/
+RUN unzip ~/chromedriver_linux64.zip -d ~/ 
+RUN rm ~/chromedriver_linux64.zip 
+RUN mv -f ~/chromedriver /usr/local/bin/chromedriver 
+RUN chown root:root /usr/local/bin/chromedriver 
+RUN chmod 0755 /usr/local/bin/chromedriver
 
 RUN pip install uv
 
