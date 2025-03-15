@@ -4,7 +4,7 @@ FROM python:3.13-bookworm
 # Устанавливаем зависимости для Chromium
 RUN apt-get -y update
     # Install Chrome.
-RUN  apt install chromium chromium-chromedriver -y
+RUN  apt install chromium -y
 RUN  apt-get install chromium-chromedriver -y
 # Install ChromeDriver.
 
