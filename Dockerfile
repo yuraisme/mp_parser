@@ -5,6 +5,7 @@ FROM python:3.13-bookworm
 RUN apt-get -y update
     # Install Chrome.
 RUN  apt install chromium -y
+RUN  apt update
 RUN  apt install chromium-chromedriver -y
 # Install ChromeDriver.
 
