@@ -35,13 +35,15 @@ def main(headless: bool = True):
                     """3 раза пробуем скачать, потом сдаёмсо"""
 
                     """но если невалидная - сдаёмся после певого раза """
-                    if i > 0 and row[9] == "! НЕВАЛИДНАЯ ССЫЛКА !":
-                        logger.warning(
-                            "Url already invalid - exit from trying"
-                        )
-                        break
+                    if len(row) > 9:  # пока лист чистый- 10го столбца нет
+                        if i > 0 and row[9] == "! НЕВАЛИДНАЯ ССЫЛКА !":
+                            logger.warning(
+                                "Url already invalid - exit from trying"
+                            )
+                            break
                     """наша ссылка"""
-                    if len(row[2]) > 10:  # проверка на вшивость
+
+                    if len(row[2]) > 10:  # проверка на то что ячейке есть URL
                         if response := parser.get_data(url):
                             # print(response)
                             logger.info(f"Send {response} to google sheet")
@@ -64,7 +66,7 @@ def main(headless: bool = True):
                             except:
                                 break
                     """ссылка конкурентов"""
-                    if len(row[7]) > 10:  # проверка на вшивость
+                    if len(row[7]) > 10:  # проверка на то что ячейке есть URL
                         if response := parser.get_data(url):
                             # print(response)
                             logger.info(f"Send {response} to google sheet")

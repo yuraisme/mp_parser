@@ -53,6 +53,7 @@ class Parser:
         while not self.browser:
             try:
                 self.browser = Chromium(self.co)
+                logger.success("Browser object was succefully create!")
             except BrowserConnectError:
                 logger.error(
                     "can't connect to browser - try killing browser process..."

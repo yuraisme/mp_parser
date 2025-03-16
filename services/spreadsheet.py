@@ -31,7 +31,7 @@ class GoogleSheetsClient:
                 self.client = self._authenticate()
                 self.sheet = self.client.open_by_key(sheet_id)
                 self.authorised = True
-                logger.info("Success connect to google spreadsheet")
+                logger.success("Success connect to google spreadsheet")
             except Exception as e:
                 logger.error(f"Problem to acces to speadsheets: {e}")
                 # raise ExceptGsheetApi
