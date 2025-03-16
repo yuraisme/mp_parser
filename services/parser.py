@@ -39,6 +39,9 @@ class Parser:
         self.co.set_argument("--no-sandbox")
         self.co.set_argument("--disable-accelerated-video-decode")
         self.co.set_argument("--disable-gpu")
+        self.co.set_argument("--disable-dev-shm-usage")
+        self.co.set_argument("--disable-software-rasterizer")
+
         # co.set_browser_path(r"chromium\bin\chrome.exe")
         self.co.headless(headless)
         self.co.no_imgs(True).mute(True)
@@ -70,6 +73,11 @@ class Parser:
         logger.info(
             "Parser object was deleted, chromium process has been killed"
         )
+
+    def _restart_browser(self):
+        """Есть нужда перезапускать, если брузер 'застрял'"""
+        kill_chromium_processes()
+        self.browser = Chromium(self.co)
 
     def _parse_price(self, marketplace_response: str | None) -> str | None:
         """универсальная для ozon и wb"""
@@ -123,6 +131,7 @@ class Parser:
                 )
             except Exception as e:
                 logger.error(f"Problem browser: {e}")
+                self._restart_browser()
         else:
             return None
         return None
@@ -150,6 +159,7 @@ class Parser:
                 )
             except Exception as e:
                 logger.error(f"Problem browser: {e}")
+                self._restart_browser()
         else:
             return None
         return None

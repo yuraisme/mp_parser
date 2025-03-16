@@ -2,28 +2,11 @@ services:
   app:
     build: .
     container_name: parsing_app
-    depends_on:
-      - chromium
-    networks:
-      - internal_net
-    command: ["uv","run","python", "main.py"]
-
-  chromium:
-    image: selenium/standalone-chrome
-    container_name: chromium
-    shm_size: 2gb
-    restart: always
-    networks:
-      - internal_net
-    environment:
-      - SCREEN_WIDTH=1280
-      - SCREEN_HEIGHT=1024
-      - SCREEN_DEPTH=24
-      - ENABLE_DEBUGGER=true
-    ports:
-      - "9222:9222" # Внешний порт для доступа (если нужно)
-      - "4444:4444"
-
-networks:
-  internal_net:
-    driver: bridge
+    deploy:
+      resources:
+        limits:
+          memory: 1GB  # Ограничиваем до 2 ГБ
+          cpu_shares = 2048 # устанавливаем приоритет повыше
+        reservations:
+          memory: 0.8GB  # Минимальный гарантированный объем памяти
+ command: ["uv","run", "main.py"]
