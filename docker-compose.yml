@@ -6,7 +6,7 @@ services:
       resources:
         limits:
           memory: 1GB  # Ограничиваем до 2 ГБ
-          cpu_shares = 2048 # устанавливаем приоритет повыше
+          cpu_shares: 2048 # устанавливаем приоритет повыше
         reservations:
           memory: 0.8GB  # Минимальный гарантированный объем памяти
  command: ["uv","run", "main.py"]
