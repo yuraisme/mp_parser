@@ -67,3 +67,10 @@ $ uv run main.py
 ```bash
 $ nohup uv run main.py &
 ```
+В этом случае на запускаемой машине должен быть явно устанвлен Chromium browser!
+например:
+
+```bash
+$ sudo apt update
+$ sudo apt-get install chromium
+```
