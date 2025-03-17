@@ -1,2 +1,0 @@
-class ExceptGsheetApi(Exception):
-    pass

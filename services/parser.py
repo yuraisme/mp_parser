@@ -26,7 +26,7 @@ class Parser:
         self.settings.set_language("en")
         self.settings.set_raise_when_wait_failed(True)
         self.settings.set_raise_when_ele_not_found(True)
-        self.co = ChromiumOptions().new_env()  # new_env for new browser
+        self.co = ChromiumOptions().new_env()  # new_env - for new browser
         window_size = (
             f"{random.randrange(800,1200)},{random.randrange(600,920)}"
         )
@@ -42,13 +42,10 @@ class Parser:
         self.co.set_argument("--disable-dev-shm-usage")
         self.co.set_argument("--disable-software-rasterizer")
 
-        # co.set_browser_path(r"chromium\bin\chrome.exe")
         self.co.headless(headless)
         self.co.no_imgs(True).mute(True)
         self.co.auto_port(True)
-        # self.co.set_paths(address="chromium", local_port='9222')
-        # self.co.set_browser_path('')
-        # self.co.set_debugger_address('chromium:3000')
+
         self.co.set_user_agent(
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36"
         )

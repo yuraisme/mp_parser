@@ -3,6 +3,7 @@
 [![Formatter](https://img.shields.io/badge/formatter-black-black)](https://github.com/psf/black)
 [![Linter](https://img.shields.io/badge/linter-mypy-1f5082)](https://mypy-lang.org/)
 [![scrapper](https://img.shields.io/badge/scrapper-DrissionPage-29ae43)](https://github.com/g1879/DrissionPage)
+![Language](https://img.shields.io/github/languages/top/yuraisme/mp_parser)
 
 Парсер для сравнения цен конкурентов с автоматическим обновлением и отчетом через Telegram. Работает напрямую с Google Sheets без использования базы данных.
 

@@ -80,7 +80,7 @@ def main(headless: bool = True):
                             try:
                                 print(sku)
                                 if atempt_idx >= MAX_RETRIES - 1:
-                                    google_sheet.set_no_valid(
+                                    google_sheet.set_no_valid_url(
                                         n_row + HEADER_ROWS_OFFSET
                                     )
                                     logger.warning(
@@ -112,7 +112,7 @@ def main(headless: bool = True):
                             try:
                                 print(sku)
                                 if atempt_idx >= MAX_RETRIES - 1:
-                                    google_sheet.set_no_valid(
+                                    google_sheet.set_no_valid_url(
                                         n_row + HEADER_ROWS_OFFSET
                                     )
                                     logger.warning(
