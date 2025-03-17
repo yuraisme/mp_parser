@@ -31,6 +31,10 @@ https://developers.google.com/workspace/guides/create-credentials?hl=ru
 ### Запуск Приложения
 
 #### Через Docker (Рекомендуется)
+```bash
+# Cкачайте проект
+git clone -b release https://github.com/yuraisme/mp_parser.git
+```
 
 ```bash
 # Соберите и запустите контейнер
