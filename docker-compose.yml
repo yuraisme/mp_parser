@@ -6,7 +6,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1GB  # Ограничиваем до 2 ГБ          
+          memory: 1GB  # Ограничиваем до 21 ГБ          
         reservations:
           memory: 0.8GB  # Минимальный гарантированный объем памяти
-    command: ["uv","run", "main.py"]
+  command: ["uv","run", "main.py"]

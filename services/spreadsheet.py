@@ -1,17 +1,27 @@
 import datetime
 import os
 import re
+import time
 from typing import List
 
 import gspread
 from dotenv import load_dotenv
 from google.oauth2.service_account import Credentials
 from gspread import Cell
+from gspread.exceptions import APIError
 from loguru import logger
 
 load_dotenv()
 SHEET_ID = os.getenv("SPREADSHEET_ID")
 TIME_ZONE = datetime.timezone(datetime.timedelta(hours=5))  #  (UTC+5)
+DELAY_FOR_GS_LIMITS = 10  # seconds
+SKU_COL = 1
+NAME_COL = 2
+PRICE_COL = 4
+TIMESTAMP_COL = 9
+SLAVE_PRICE_COL = 5
+SLAVE_PREV_PRICE_COL = 6
+SLAVE_DIFF_PRICE_COL = 7
 
 
 class GoogleSheetsClient:
@@ -28,12 +38,16 @@ class GoogleSheetsClient:
             try:
                 self.credentials_path = credentials_path
                 self.sheet_id = sheet_id
+                if not SHEET_ID:
+                    raise ValueError(
+                        "SPREADSHEET_ID is not set in environment variables"
+                    )
                 self.client = self._authenticate()
                 self.sheet = self.client.open_by_key(sheet_id)
                 self.authorised = True
                 logger.success("Success connect to google spreadsheet")
             except Exception as e:
-                logger.error(f"Problem to acces to speadsheets: {e}")
+                logger.error(f"Problem with speadsheets: {e}")
                 # raise ExceptGsheetApi
         else:
             logger.error("Where no sheet id name")
@@ -62,17 +76,25 @@ class GoogleSheetsClient:
         )
 
         cells = [
-            Cell(row, 1, sku),  # A
-            Cell(row, 2, name),  # B
-            Cell(row, 4, price),  # D
-            Cell(row, 9, timestamp),  # I
+            Cell(row, SKU_COL, sku),  # A
+            Cell(row, NAME_COL, name),  # B
+            Cell(row, PRICE_COL, price),  # D
+            Cell(row, TIMESTAMP_COL, timestamp),  # I
         ]
-        self.sheet.sheet1.update_cells(cells)
+        try:
+            self.sheet.sheet1.update_cells(cells)
+        except APIError as e:
+            if e.code == 429:
+                logger.error("Overdraft limit connections to SG")
+                time.sleep(DELAY_FOR_GS_LIMITS)
+                return None
+            logger.error(f"Error while write to GS sku {sku}: {e}")
 
     def update_slave(self, row: int, price: str, prev_price: str):
         timestamp = datetime.datetime.now(TIME_ZONE).strftime(
             "%d.%m.%Y %H:%M:%S"
         )
+        """используем буффер на листе"""
         diff_price = "0"
         if price != "" and prev_price != "":
             diff_price = (
@@ -80,12 +102,19 @@ class GoogleSheetsClient:
             )
 
         cells = [
-            Cell(row, 5, price),  # E
-            Cell(row, 6, prev_price),  # F
-            Cell(row, 7, diff_price),  # G
-            Cell(row, 9, timestamp),  # I
+            Cell(row, SLAVE_PRICE_COL, price),  # E
+            Cell(row, SLAVE_PREV_PRICE_COL, prev_price),  # F
+            Cell(row, SLAVE_DIFF_PRICE_COL, diff_price),  # G
+            Cell(row, TIMESTAMP_COL, timestamp),  # I
         ]
-        self.sheet.sheet1.update_cells(cells)
+        try:
+            self.sheet.sheet1.update_cells(cells)
+        except APIError as e:
+            if e.code == 429:
+                logger.error("Overdraft limit connections to SG")
+                time.sleep(DELAY_FOR_GS_LIMITS)
+                return None
+            logger.error(f"Error while write to GS: {e}")
 
     def set_no_valid(self, row: int):
         self.sheet.sheet1.update_cell(row, 10, "! НЕВАЛИДНАЯ ССЫЛКА !")
@@ -113,8 +142,7 @@ def get_sku(url: str | None = None) -> str | None:
 
 if __name__ == "__main__":
     client = GoogleSheetsClient(
-        os.path.join(os.getcwd(), "services", "credentials.json"),
-        SHEET_ID,
+        os.path.join(os.getcwd(), "services", "credentials.json"), SHEET_ID
     )
 
     if client.authorised:

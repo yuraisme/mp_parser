@@ -21,7 +21,7 @@ def kill_chromium_processes():
 class Parser:
 
     def __init__(self, headless: bool = True) -> None:
-        logger.info("Create Parser object, set settings for Browser")
+        logger.info("Creating Parser object, set settings for Browser")
         self.settings = Settings()
         self.settings.set_language("en")
         self.settings.set_raise_when_wait_failed(True)
@@ -56,7 +56,9 @@ class Parser:
         while not self.browser:
             try:
                 self.browser = Chromium(self.co)
-                logger.success("Browser object was succefully create!")
+                logger.success(
+                    "Parser object was succefully create, Browser was connected!"
+                )
             except BrowserConnectError:
                 logger.error(
                     "can't connect to browser - try killing browser process..."
@@ -130,7 +132,7 @@ class Parser:
                     f"No element find on the page - page does not exits or wrong"
                 )
             except Exception as e:
-                logger.error(f"Problem browser: {e}")
+                logger.error(f"Problem with browser: {e}")
                 self._restart_browser()
         else:
             return None
@@ -158,7 +160,7 @@ class Parser:
                     f"No element find on the page - page does not exits or wrong"
                 )
             except Exception as e:
-                logger.error(f"Problem browser: {e}")
+                logger.error(f"Problem with browser: {e}")
                 self._restart_browser()
         else:
             return None

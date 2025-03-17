@@ -10,14 +10,19 @@ load_dotenv()
 
 class Telebot:
     def __init__(self) -> None:
-        self.token = os.getenv("TELEGRAM_TOKEN") or ""
-        self.group_id = os.getenv("TELEGRAM_GROUP_ID") or ""
-        if self.token == "" or self.group_id == "":
-            logger.error(
-                "Error: TELEGRAM_TOKEN и TELEGRAM_GROUP_ID must be setting up"
-            )
-            sys.exit(1)
-        self.bot = telebot.TeleBot(self.token)
+        try:
+            logger.info("Creating telegram bot object...")
+            self.token = os.getenv("TELEGRAM_TOKEN") or ""
+            self.group_id = os.getenv("TELEGRAM_GROUP_ID") or ""
+            if self.token == "" or self.group_id == "":
+                logger.error(
+                    "Error: TELEGRAM_TOKEN и TELEGRAM_GROUP_ID must be setting up"
+                )
+                sys.exit(1)
+            self.bot = telebot.TeleBot(self.token)
+            logger.success("Telegramm object succefully create!")
+        except Exception as e:
+            logger.critical(f"Bot wasn't create: {e}")
 
     def send_message(self, url: str, price_prev: str, price_current: str):
         if (
