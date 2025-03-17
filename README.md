@@ -2,7 +2,7 @@
 
 [![Formatter](https://img.shields.io/badge/formatter-black-black)](https://github.com/psf/black)
 [![Linter](https://img.shields.io/badge/linter-mypy-1f5082)](https://mypy-lang.org/)
-[![Linter](https://img.shields.io/badge/scrapper-DrissionPage-29ae43)](https://github.com/g1879/DrissionPage)
+[![scrapper](https://img.shields.io/badge/scrapper-DrissionPage-29ae43)](https://github.com/g1879/DrissionPage)
 
 Парсер для сравнения цен конкурентов с автоматическим обновлением и отчетом через Telegram. Работает напрямую с Google Sheets без использования базы данных.
 
@@ -19,6 +19,14 @@
      curl -s "https://api.telegram.org/bot<TOKEN>/getUpdates"
      ```
      После получения ID, удалите этот файл для безопасности.
+
+Пример `.env`:
+
+```ini
+SPREADSHEET_ID=your_spreadsheet_id_here
+TELEGRAM_TOKEN=your_bot_token_here
+TELEGRAM_GROUP_ID=-123456789
+```
 
 ### Настройка Google Sheets
 
