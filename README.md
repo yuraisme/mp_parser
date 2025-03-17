@@ -43,7 +43,7 @@ https://developers.google.com/workspace/guides/create-credentials?hl=ru
 #### Через Docker (Рекомендуется)
 ```bash
 # Cкачайте проект
-git clone -b release https://github.com/yuraisme/mp_parser.git
+git clone https://github.com/yuraisme/mp_parser.git
 ```
 
 ```bash
