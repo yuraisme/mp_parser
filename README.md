@@ -91,6 +91,7 @@ docker logs parsing_app
 - Docker (для запуска через Docker)
 - Google Account с настроенными API
 - Telegram-бот
+- Установленный Chromium (для запуска не через Docker)
 
 ## Лицензия
 
