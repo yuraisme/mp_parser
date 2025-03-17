@@ -13,7 +13,7 @@
 1. Создайте файл `.env` в корневой директории проекта
 2. Заполните следующими переменными:
    - `SPREADSHEET_ID`: ID вашей Google Таблицы (берется из URL)
-   - `TELEGRAM_TOKEN`: Токен вашего Telegram-бота (получите через @BotFather)
+   - `TELEGRAM_TOKEN`: Токен вашего Telegram-бота (получите через [@BotFather](https://telegram.me/BotFather))
    - `TELEGRAM_GROUP_ID`: ID чата группы (обычно отрицательное число). Получить можно через запрос:
      ```bash
      curl -s "https://api.telegram.org/bot<TOKEN>/getUpdates"
