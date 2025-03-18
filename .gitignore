@@ -12,4 +12,4 @@ wheels/
 .env
 *.sqlite3
 credentials.json
-
+.vscode
