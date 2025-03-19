@@ -1,6 +1,7 @@
 import datetime
 import os
 import re
+import sys
 import time
 from typing import List
 
@@ -43,8 +44,13 @@ class GoogleSheetsClient:
                 self.sheet = self.client.open_by_key(sheet_id)
                 self.authorised = True
                 logger.success("Success connect to google spreadsheet")
+            except PermissionError as e:
+                logger.exception(f"Problem with acces to spreadsheet: {e}")
+                sys.exit(0)
+                
             except Exception as e:
-                logger.error(f"Problem with speadsheets: {e}")
+                logger.exception(f"Problem with speadsheets: {e}")
+                sys.exit(0)
         else:
             logger.error("GS sheet ID hadn't loaded")
             raise ValueError("SPREADSHEET_ID is not set in env variables")

@@ -13,3 +13,5 @@ wheels/
 *.sqlite3
 credentials.json
 .vscode
+services/credentials.json_mine
+test.py
