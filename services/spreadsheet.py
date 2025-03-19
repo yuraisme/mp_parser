@@ -116,9 +116,23 @@ class GoogleSheetsClient:
             logger.error(f"Error while write to GS: {e}")
 
     def set_no_valid_url(self, row: int):
-        self.sheet.sheet1.update_cell(
-            row, NO_VALID_COL, "! НЕВАЛИДНАЯ ССЫЛКА !"
-        )
+        try:
+            self.sheet.sheet1.update_cell(
+                row, NO_VALID_COL, "! НЕВАЛИДНАЯ ССЫЛКА !"
+            )
+        except Exception as e:
+            logger.error(f"Error during GS was added no valid sku: {e}")
+
+    def clear_row(self, row: int):
+        cells = [Cell(row, col, "") for col in range(1, 10)]
+        self.sheet.sheet1.update_cells(cells)
+
+    def clear_no_valid_url(self, row: int):
+        logger.debug("Clear no valid URl cell")
+        try:
+            self.sheet.sheet1.update_cell(row, NO_VALID_COL, "")
+        except Exception as e:
+            logger.error(f"Error during GS was clear no valid sku: {e}")
 
 
 def get_sku(url: str | None = None) -> str | None:

@@ -21,6 +21,7 @@ OUR_URL_IDX = 2
 OPPONENT_URL_IDX = 7
 PREV_PRICE_IDX = 4
 DELAY_RANGE = (3, 5)
+logger.level("COUNT", no=15, color="<m><bold>")
 
 
 def main(headless: bool = True):
@@ -37,11 +38,14 @@ def main(headless: bool = True):
         """начинаем не с самого вверха = отступаем шапку"""
         for n_row, row in enumerate(gs_data[HEADER_ROWS_OFFSET - 1 :]):
             try:
+                logger.log("COUNT", f"Row N: {n_row+HEADER_ROWS_OFFSET}")
                 # проверяем какой урл будем проверять - свой или конкурента
                 url = row[OUR_URL_IDX]
                 if "http" in row[OPPONENT_URL_IDX]:
                     url = row[OPPONENT_URL_IDX]
                 if url == "":
+                    # какие-рудименты остались нужно уброать
+                    google_sheet.clear_row(n_row + HEADER_ROWS_OFFSET)
                     continue
                 sku = get_sku(url) or ""
 
@@ -57,9 +61,7 @@ def main(headless: bool = True):
                             and row[NO_VALID_DATA_IDX]
                             == "! НЕВАЛИДНАЯ ССЫЛКА !"
                         ):
-                            logger.warning(
-                                "Url already invalid - exit from trying"
-                            )
+                            logger.warning("Url already invalid-exit tryng")
                             break  # выходим из цикла попыток
 
                     """наша ссылка"""
@@ -74,23 +76,25 @@ def main(headless: bool = True):
                                 response["Price"],
                                 sku,
                             )
+                            if (
+                                len(row) >= ROW_LEN_WITH_INVALID_COL
+                                and row[NO_VALID_DATA_IDX]
+                                == "! НЕВАЛИДНАЯ ССЫЛКА !"
+                            ):
+                                google_sheet.clear_no_valid_url(
+                                    n_row + HEADER_ROWS_OFFSET
+                                )
                             break
                         else:
                             time.sleep(random.randrange(*DELAY_RANGE))
-                            try:
-                                print(sku)
-                                if atempt_idx >= MAX_RETRIES - 1:
-                                    google_sheet.set_no_valid_url(
-                                        n_row + HEADER_ROWS_OFFSET
-                                    )
-                                    logger.warning(
-                                        f"Looks like {sku} isn't valid"
-                                    )
-                            except Exception as e:
-                                logger.error(
-                                    f"Error during GS was added no valid sku: {e}"
+                            print(sku)
+                            if atempt_idx >= MAX_RETRIES - 1:
+                                google_sheet.set_no_valid_url(
+                                    n_row + HEADER_ROWS_OFFSET
                                 )
-                                break
+                                logger.warning(
+                                    f"Looks like {sku} isn't valid"
+                                )
 
                     """ссылка конкурентов"""
                     # проверка на то что ячейке есть URL
@@ -106,23 +110,24 @@ def main(headless: bool = True):
                             bot.send_message(
                                 url, row[PREV_PRICE_IDX], response["Price"]
                             )
+                            if (
+                                len(row) >= ROW_LEN_WITH_INVALID_COL
+                                and row[NO_VALID_DATA_IDX]
+                                == "! НЕВАЛИДНАЯ ССЫЛКА !"
+                            ):
+                                google_sheet.clear_no_valid_url(
+                                    n_row + HEADER_ROWS_OFFSET
+                                )
                             break
                         else:
                             time.sleep(random.randrange(*DELAY_RANGE))
-                            try:
-                                print(sku)
-                                if atempt_idx >= MAX_RETRIES - 1:
-                                    google_sheet.set_no_valid_url(
-                                        n_row + HEADER_ROWS_OFFSET
-                                    )
-                                    logger.warning(
-                                        f"Looks like {sku} not valid"
-                                    )
-                            except Exception as e:
-                                logger.error(
-                                    f"Error during GS was added no valid sku: {e}"
+                            print(sku)
+                            if atempt_idx >= MAX_RETRIES - 1:
+                                google_sheet.set_no_valid_url(
+                                    n_row + HEADER_ROWS_OFFSET
                                 )
-                                break
+                                logger.warning(f"Looks like {sku} not valid")
+
             except KeyboardInterrupt:
                 logger.warning("Exit at the user's request")
                 sys.exit(0)

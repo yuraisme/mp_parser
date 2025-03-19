@@ -126,7 +126,7 @@ class Parser:
                             return {"Price": price, "Name": name}
             except ElementNotFoundError:
                 logger.error(
-                    f"No element find on the page - page does not exits or wrong"
+                    "No element find on the page - page does not exits or wrong"
                 )
             except Exception as e:
                 logger.error(f"Problem with browser: {e}")
@@ -145,8 +145,9 @@ class Parser:
             try:
                 logger.info("loading page wb....")
                 if self.tab.get(url):
-                    res = self.tab.ele("@class=price-block__price")
+                    res = self.tab.ele("@class=price-block")
                     price = self._parse_price(res.text)
+
                     res = self.tab.ele("@class=product-page__title")
                     name = res.text
                     if price:
@@ -154,7 +155,7 @@ class Parser:
                             return {"Price": price, "Name": name}
             except ElementNotFoundError:
                 logger.error(
-                    f"No element find on the page - page does not exits or wrong"
+                    "No element find on the page - page does not exits or wrong"
                 )
             except Exception as e:
                 logger.error(f"Problem with browser: {e}")
@@ -165,9 +166,9 @@ class Parser:
 
 
 if __name__ == "__main__":
-    parser = Parser()
-    res = parser.get_ozon_price(
-        "https://www.ozon.ru/product/makarony-makfa-makfa-rozhki-gladkie-vysshiy-sort-400g-makaronnye-izdeliya-komplekt-iz-4-sht-197877686/"
+    parser = Parser(False)
+    res = parser.get_data(
+        "https://www.wildberries.ru/catalog/242938824/detail.aspx"
     )
     print(res)
 
